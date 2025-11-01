@@ -1,0 +1,134 @@
+/* Estilos generales del cuerpo */
+body {
+  font-family: Arial, sans-serif;
+  margin: 10px;
+  font-size: 12px;
+  line-height: 1.4; /* Mejora la legibilidad del texto */
+  color: #333;
+}
+
+/* Estilos para inputs, selects, buttons y textareas */
+input,
+select,
+button,
+textarea {
+  padding: 6px;
+  margin: 3px 0;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Estilos para tablas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: center;
+  page-break-inside: avoid;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+/* Secciones del formulario */
+.form-section {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  background-color: #fff;
+  page-break-inside: avoid;
+}
+
+/* Filas del formulario con flexbox */
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 5px;
+  page-break-inside: avoid;
+}
+
+.form-row label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+/* Elementos que no se imprimen */
+.no-print {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Estilos para los ítems del historial */
+.historial-item {
+  border: 1px solid #bbb;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: #f8f8f8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.historial-item p {
+  margin: 3px 0;
+}
+
+/* Ocultar elementos no imprimibles al imprimir */
+@media print {
+  .no-print,
+  .no-print * {
+    display: none !important;
+    visibility: hidden;
+  }
+  body {
+    margin: 0;
+    font-size: 10px;
+  }
+  table,
+  th,
+  td {
+    border-color: #999;
+  }
+  .form-section {
+    border: none;
+    padding: 0;
+  }
+}
+
+/* Ocultar elementos no imprimibles durante la exportación a PDF */
+body.exportando .no-print,
+body.exportando .no-print * {
+  display: none !important;
+  visibility: hidden;
+}

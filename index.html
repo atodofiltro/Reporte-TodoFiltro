@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📋 Control de Servicios</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <div id="formulario">
+    <h3 style="text-align: center; color: #007bff">
+      📋 Formulario de Control de Servicios
+    </h3>
+
+    <div class="form-section">
+      <label>📅 Fecha: <input type="date" id="fecha" required /></label>
+      <div class="form-row">
+        <label>👤 Cliente: <input type="text" id="cliente" required /></label>
+        <label>🆔 RUC: <input type="text" id="ruc" /></label>
+      </div>
+      <div class="form-row">
+        <label>🚗 Vehículo: <input type="text" id="vehiculo" required /></label>
+        <label>🔢 Chapa: <input type="text" id="chapa" required /></label>
+      </div>
+      <div class="form-row">
+        <label>🧑‍🔧 Mecánico: <input type="text" id="mecanico" /></label>
+        <label>🧾 Factura N°: <input type="text" id="factura" /></label>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label>🛠 Servicios realizados:</label>
+      <table id="tabla-servicios-realizados">
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>Monto</th>
+            <th class="no-print">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" class="servicio-realizado" required readonly /></td>
+            <td><input type="number" class="monto-servicio-realizado" value="0" min="0" readonly /></td>
+            <td class="no-print">
+              <button onclick="editarFila(this)">✏️</button>
+              <button onclick="eliminarFila(this)">🗑</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="no-print">
+        <button onclick="toggleEdicion()">🔐 Bloquear/Desbloquear Campos</button>
+        <button onclick="agregarServicioRealizado()">➕ Agregar Servicio</button>
+      </div>
+      <strong>Total del servicio: <span id="montoServicio">0</span></strong>
+    </div>
+
+    <label>📦 Ítems utilizados:</label>
+    <table id="tabla-servicios">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Cantidad</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Total</th>
+          <th class="no-print">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" class="codigo" readonly /></td>
+          <td><input type="number" class="cantidad" value="1" min="0" readonly /></td>
+          <td><input type="text" class="descripcion" readonly /></td>
+          <td><input type="number" class="precio" value="0" min="0" readonly /></td>
+          <td class="total">0</td>
+          <td class="no-print">
+            <button onclick="editarFila(this)">✏️</button>
+            <button onclick="eliminarFila(this)">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="no-print">
+      <button onclick="toggleEdicion()">🔐 Bloquear/Desbloquear Campos</button>
+      <button onclick="agregarFila()">➕ Agregar Ítem</button>
+      <button onclick="calcularTotales()">🔄 Recalcular Totales</button>
+      <button onclick="guardarHistorial()">💾 Guardar Control</button>
+      <button onclick="generarPDF()">📄 Generar PDF</button>
+      <button onclick="limpiarFormulario()">🧹 Limpiar Formulario</button>
+    </div>
+
+    <p><strong>Total ítems:</strong> <span id="total-general">0</span></p>
+    <p><strong>Diferencia:</strong> <span id="diferencia">0</span></p>
+    <p><strong>Monto total final:</strong> <span id="monto-total-final">0</span></p>
+  </div>
+
+  <div class="form-section">
+    <h3 style="color: #007bff">📁 Historial de Controles Guardados</h3>
+    <div id="historial-lista">
+      <!-- Aquí se cargará el historial -->
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
