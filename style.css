@@ -132,3 +132,171 @@ body.exportando .no-print * {
   display: none !important;
   visibility: hidden;
 }
+
+/* Mensaje flotante top */
+#mensaje-flotante {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: linear-gradient(90deg, #000, #007bff);
+  color: #fff;
+  padding: 20px 35px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 9999;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+#mensaje-flotante.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+
+#confirmacion-flotante {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: linear-gradient(90deg, #000, #007bff);
+  color: #fff;
+  padding: 25px 40px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 10000;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+#confirmacion-flotante.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+#confirmacion-flotante .botones {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+#confirmacion-flotante button {
+  padding: 8px 18px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#confirmacion-flotante button.aceptar {
+  background-color: #007bff;
+  color: #fff;
+}
+
+#confirmacion-flotante button.aceptar:hover {
+  background-color: #0056b3;
+}
+
+#confirmacion-flotante button.cancelar {
+  background-color: #333;
+  color: #fff;
+}
+
+#confirmacion-flotante button.cancelar:hover {
+  background-color: #555;
+}
+
+
+button {
+  background: linear-gradient(90deg, #000, #007bff); /* De negro a azul */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.no-print button {
+  margin: 4px 2px; /* Espacio entre botones */
+}
+
+body {
+  position: relative;
+  font-family: Arial, sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed; /* Fija la imagen aunque hagas scroll */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('todofiltro.webp') no-repeat center center;
+  background-size: contain; /* Ajusta el tamaño proporcional */
+  opacity: 0.25; /* Controla qué tan visible quieres la imagen */
+  z-index: -1; /* La coloca detrás de todo */
+}
+
+
+form, .contenedor, .bloque {
+  background: transparent;
+}
+
+
+/* Encabezado de la empresa */
+/* Encabezado de la empresa (versión más chica) */
+.header-empresa {
+  position: fixed;
+  top: 10px;
+  left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0, 0, 255, 0.4);
+  z-index: 9999;
+  transform: scale(0.95);
+}
+
+.logo-empresa {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 255, 0.7));
+}
+
+.nombre-empresa {
+  color: #00aaff;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(0, 0, 255, 0.5);
+  font-family: 'Poppins', sans-serif;
+}

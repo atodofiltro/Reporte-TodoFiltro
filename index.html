@@ -8,6 +8,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
+  <header class="header-empresa">
+  <img src="todofiltro.webp" alt="Logo Todo Filtro" class="logo-empresa">
+  <h1 class="nombre-empresa">Todo Filtro</h1>
+</header>
+
   <div id="formulario">
     <h3 style="text-align: center; color: #007bff">
       📋 Formulario de Control de Servicios
@@ -90,7 +95,8 @@
       <button onclick="calcularTotales()">🔄 Recalcular Totales</button>
       <button onclick="guardarHistorial()">💾 Guardar Control</button>
       <button onclick="generarPDF()">📄 Generar PDF</button>
-      <button onclick="limpiarFormulario()">🧹 Limpiar Formulario</button>
+      <button type="button" onclick="limpiarFormulario()">🧹 Limpiar Formulario</button>
+
     </div>
 
     <p><strong>Total ítems:</strong> <span id="total-general">0</span></p>
@@ -104,7 +110,19 @@
       <!-- Aquí se cargará el historial -->
     </div>
   </div>
+  
 
-  <script src="script.js"></script>
+  
+  <!-- Contenedor para mensaje flotante -->
+<div id="mensaje-flotante"></div>
+<div id="confirmacion-flotante">
+  <div id="mensaje-confirmacion"></div>
+  <div class="botones">
+    <button class="aceptar">Aceptar</button>
+    <button class="cancelar">Cancelar</button>
+  </div>
+</div>
+
+<script src="script.js" defer></script>
 </body>
 </html>

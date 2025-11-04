@@ -1,17 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-  actualizarEventos(); // Asigna eventos a los inputs existentes
-  calcularTotales(); // Calcula los totales iniciales
-  habilitarEnterParaTabular(); // Habilita la navegación con Enter
-  mostrarHistorial(); // Muestra el historial guardado al cargar la página
+  actualizarEventos();
+  calcularTotales();
+  habilitarEnterParaTabular();
+  mostrarHistorial(); // obtiene los datos desde el backend
 });
 
 /* ===========================
-   Funciones para la gestión de tablas
+   Funciones para tablas
 =========================== */
-
-/**
- * Agrega una nueva fila a la tabla de ítems utilizados.
- */
 function agregarFila(codigo = "", cantidad = 1, descripcion = "", precio = 0) {
   const fila = document.createElement("tr");
   fila.innerHTML = `
@@ -31,9 +27,6 @@ function agregarFila(codigo = "", cantidad = 1, descripcion = "", precio = 0) {
   calcularTotales();
 }
 
-/**
- * Agrega una nueva fila a la tabla de servicios realizados.
- */
 function agregarServicioRealizado(servicio = "", monto = 0) {
   const fila = document.createElement("tr");
   fila.innerHTML = `
@@ -50,9 +43,6 @@ function agregarServicioRealizado(servicio = "", monto = 0) {
   calcularTotales();
 }
 
-/**
- * Habilita la edición de los campos de una fila.
- */
 function editarFila(btn) {
   const row = btn.closest("tr");
   row.querySelectorAll("input").forEach(i => i.removeAttribute("readonly"));
@@ -62,9 +52,6 @@ function editarFila(btn) {
   btn.parentNode.replaceChild(saveBtn, btn);
 }
 
-/**
- * Guarda los cambios realizados en una fila editada.
- */
 function guardarFilaEditada(btn) {
   const row = btn.closest("tr");
   row.querySelectorAll("input").forEach(i => i.setAttribute("readonly", true));
@@ -75,17 +62,11 @@ function guardarFilaEditada(btn) {
   calcularTotales();
 }
 
-/**
- * Elimina la fila de la tabla.
- */
 function eliminarFila(btn) {
   btn.closest("tr").remove();
   calcularTotales();
 }
 
-/**
- * Asigna el evento 'input' para recalcular totales automáticamente.
- */
 function actualizarEventos() {
   document.querySelectorAll(".cantidad, .precio, .monto-servicio-realizado").forEach(inp => {
     inp.oninput = calcularTotales;
@@ -93,7 +74,7 @@ function actualizarEventos() {
 }
 
 /* ===========================
-   Funciones de Cálculo de Totales
+   Totales
 =========================== */
 function calcularTotales() {
   let totalItems = 0;
@@ -111,13 +92,12 @@ function calcularTotales() {
     totalServ += parseFloat(i.value) || 0;
   });
   document.getElementById("montoServicio").textContent = totalServ.toFixed(0);
-
   document.getElementById("diferencia").textContent = (totalServ - totalItems).toFixed(0);
   document.getElementById("monto-total-final").textContent = totalServ.toFixed(0);
 }
 
 /* ===========================
-   Funciones de Usabilidad
+   Usabilidad
 =========================== */
 function habilitarEnterParaTabular() {
   const inputs = [...document.querySelectorAll("input,textarea")];
@@ -140,7 +120,7 @@ function toggleEdicion() {
 }
 
 /* ===========================
-   Funciones de Exportación PDF
+   PDF
 =========================== */
 function generarPDF() {
   document.body.classList.add("exportando");
@@ -160,131 +140,9 @@ function generarPDF() {
     });
 }
 
-/* ===========================
-   Funciones de Historial (localStorage)
-=========================== */
-const KEY = "historialControles";
-
-function recolectarDatos() {
-  const serviciosRealizados = [];
-  document.querySelectorAll("#tabla-servicios-realizados tbody tr").forEach(row => {
-    serviciosRealizados.push({
-      servicio: row.querySelector(".servicio-realizado").value,
-      monto: parseFloat(row.querySelector(".monto-servicio-realizado").value) || 0,
-    });
-  });
-
-  const items = [];
-  document.querySelectorAll("#tabla-servicios tbody tr").forEach(row => {
-    items.push({
-      codigo: row.querySelector(".codigo").value,
-      cantidad: parseFloat(row.querySelector(".cantidad").value) || 0,
-      descripcion: row.querySelector(".descripcion").value,
-      precio: parseFloat(row.querySelector(".precio").value) || 0,
-    });
-  });
-
-  return {
-    fecha: document.getElementById("fecha").value,
-    cliente: document.getElementById("cliente").value,
-    ruc: document.getElementById("ruc").value,
-    vehiculo: document.getElementById("vehiculo").value,
-    chapa: document.getElementById("chapa").value,
-    mecanico: document.getElementById("mecanico").value,
-    factura: document.getElementById("factura").value,
-    serviciosRealizados,
-    items,
-    totales: {
-      totalItems: document.getElementById("total-general").textContent,
-      totalServicios: document.getElementById("montoServicio").textContent,
-      diferencia: document.getElementById("diferencia").textContent,
-      montoFinal: document.getElementById("monto-total-final").textContent,
-    },
-  };
-}
-
-function guardarHistorial() {
-  const nuevoControl = recolectarDatos();
-  let historial = JSON.parse(localStorage.getItem(KEY)) || [];
-  historial.push(nuevoControl);
-  localStorage.setItem(KEY, JSON.stringify(historial));
-  alert("Control guardado en el historial local.");
-  mostrarHistorial();
-}
-
-function mostrarHistorial() {
-  const historialLista = document.getElementById("historial-lista");
-  historialLista.innerHTML = "";
-  let historial = JSON.parse(localStorage.getItem(KEY)) || [];
-
-  if (historial.length === 0) {
-    historialLista.innerHTML = "<p>No hay controles guardados en el historial</p>";
-    return;
-  }
-
-  historial.forEach((control, index) => {
-    const itemDiv = document.createElement("div");
-    itemDiv.classList.add("historial-item");
-    itemDiv.innerHTML = `
-      <p><strong>Fecha:</strong> ${control.fecha || "N/A"}</p>
-      <p><strong>Cliente:</strong> ${control.cliente || "N/A"}</p>
-      <p><strong>Vehículo:</strong> ${control.vehiculo || "N/A"} - ${control.chapa || "N/A"}</p>
-      <p><strong>Monto Total Final:</strong> ${control.totales.montoFinal || "0"}</p>
-      <div class="no-print">
-        <button onclick="cargarHistorial(${index})">Cargar</button>
-        <button onclick="eliminarHistorial(${index})">Eliminar</button>
-      </div>
-    `;
-    historialLista.appendChild(itemDiv);
-  });
-}
-
-function cargarHistorial(index) {
-  let historial = JSON.parse(localStorage.getItem(KEY)) || [];
-  if (index >= 0 && index < historial.length) {
-    const control = historial[index];
-
-    document.getElementById("fecha").value = control.fecha;
-    document.getElementById("cliente").value = control.cliente;
-    document.getElementById("ruc").value = control.ruc;
-    document.getElementById("vehiculo").value = control.vehiculo;
-    document.getElementById("chapa").value = control.chapa;
-    document.getElementById("mecanico").value = control.mecanico;
-    document.getElementById("factura").value = control.factura;
-
-    document.querySelector("#tabla-servicios-realizados tbody").innerHTML = "";
-    document.querySelector("#tabla-servicios tbody").innerHTML = "";
-
-    if (control.serviciosRealizados?.length > 0) {
-      control.serviciosRealizados.forEach(sr => agregarServicioRealizado(sr.servicio, sr.monto));
-    } else {
-      agregarServicioRealizado();
-    }
-
-    if (control.items?.length > 0) {
-      control.items.forEach(item => agregarFila(item.codigo, item.cantidad, item.descripcion, item.precio));
-    } else {
-      agregarFila();
-    }
-
-    calcularTotales();
-    alert("Control cargado exitosamente.");
-  } else {
-    alert("Error: Índice de historial no válido.");
-  }
-}
-
-function eliminarHistorial(index) {
-  let historial = JSON.parse(localStorage.getItem(KEY)) || [];
-  if (confirm("¿Estás seguro de que quieres eliminar este control del historial? Esta acción es irreversible.")) {
-    historial.splice(index, 1);
-    localStorage.setItem(KEY, JSON.stringify(historial));
-    mostrarHistorial();
-    alert("Control eliminado del historial.");
-  }
-}
 
 function limpiarFormulario() {
+  // Limpiar campos de texto
   document.getElementById("fecha").value = "";
   document.getElementById("cliente").value = "";
   document.getElementById("ruc").value = "";
@@ -293,14 +151,214 @@ function limpiarFormulario() {
   document.getElementById("mecanico").value = "";
   document.getElementById("factura").value = "";
 
-  document.querySelector("#tabla-servicios-realizados tbody").innerHTML = "";
-  agregarServicioRealizado();
-
+  // Limpiar tablas
   document.querySelector("#tabla-servicios tbody").innerHTML = "";
-  agregarFila();
+  document.querySelector("#tabla-servicios-realizados tbody").innerHTML = "";
 
-  calcularTotales();
-  actualizarEventos();
-  habilitarEnterParaTabular();
-  alert("Formulario limpiado");
+  // Limpiar totales
+  document.getElementById("total-general").textContent = "0";
+  document.getElementById("montoServicio").textContent = "0";
+  document.getElementById("diferencia").textContent = "0";
+  document.getElementById("monto-total-final").textContent = "0";
+
+  // Opcional: agregar una fila vacía al inicio
+  agregarFila();
+  agregarServicioRealizado();
 }
+/* ===========================
+   Funciones con backend (offline)
+=========================== */
+async function guardarHistorial() {
+  try {
+    const nuevoControl = recolectarDatos(); // recolecta TODOS los datos del formulario
+
+    const res = await fetch("http://localhost:3000/api/guardar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nuevoControl)
+    });
+
+    const data = await res.json();
+    mostrarMensaje(data.mensaje); // mensaje flotante bonito
+
+    // actualizar historial en el frontend
+    mostrarHistorial();
+
+  } catch (err) {
+    console.error("Error al guardar:", err);
+    mostrarMensaje("Error al guardar control ❌");
+  }
+}
+
+
+async function mostrarHistorial() {
+  try {
+    const res = await fetch("http://localhost:3000/api/historial");
+    const historial = await res.json();
+    const historialLista = document.getElementById("historial-lista");
+    historialLista.innerHTML = "";
+
+    if (historial.length === 0) {
+      historialLista.innerHTML = "<p>No hay controles guardados en el historial</p>";
+      return;
+    }
+
+    historial.forEach((control, index) => {
+      const itemDiv = document.createElement("div");
+      itemDiv.classList.add("historial-item");
+      itemDiv.innerHTML = `
+        <p><strong>Fecha:</strong> ${control.fecha || "N/A"}</p>
+        <p><strong>Cliente:</strong> ${control.cliente || "N/A"}</p>
+        <p><strong>Vehículo:</strong> ${control.vehiculo || "N/A"} - ${control.chapa || "N/A"}</p>
+        <p><strong>Monto Total Final:</strong> ${control.totales?.montoFinal || "0"}</p>
+        <div class="no-print">
+          <button onclick="cargarHistorial(${index})">Cargar</button>
+          <button onclick="eliminarHistorial(${index})">Eliminar</button>
+        </div>
+      `;
+      historialLista.appendChild(itemDiv);
+    });
+  } catch (err) {
+    console.error("Error al cargar historial:", err);
+    mostrarMensaje("Error al cargar historial ❌");
+  }
+}
+
+
+async function cargarHistorial(index) {
+  try {
+    const res = await fetch("http://localhost:3000/api/historial");
+    const historial = await res.json();
+
+    if (index >= 0 && index < historial.length) {
+      const control = historial[index];
+
+      // === Campos generales ===
+      document.getElementById("fecha").value = control.fecha || "";
+      document.getElementById("cliente").value = control.cliente || "";
+      document.getElementById("ruc").value = control.ruc || "";
+      document.getElementById("vehiculo").value = control.vehiculo || "";
+      document.getElementById("chapa").value = control.chapa || "";
+      document.getElementById("mecanico").value = control.mecanico || "";
+      document.getElementById("factura").value = control.factura || "";
+
+      // === Tabla servicios realizados ===
+      const tbodyServicios = document.querySelector("#tabla-servicios-realizados tbody");
+      tbodyServicios.innerHTML = "";
+      if (control.serviciosRealizados?.length > 0) {
+        control.serviciosRealizados.forEach(sr => agregarServicioRealizado(sr.servicio, sr.monto));
+      } else {
+        agregarServicioRealizado();
+      }
+
+      // === Tabla ítems utilizados ===
+      const tbodyItems = document.querySelector("#tabla-servicios tbody");
+      tbodyItems.innerHTML = "";
+      if (control.items?.length > 0) {
+        control.items.forEach(item => agregarFila(item.codigo, item.cantidad, item.descripcion, item.precio));
+      } else {
+        agregarFila();
+      }
+
+      // === Totales ===
+      calcularTotales();
+
+      // === Mensaje flotante bonito ===
+      mostrarMensaje(`Control de ${control.cliente} cargado exitosamente ✅`);
+    } else {
+      mostrarMensaje("Error: índice de historial no válido ❌");
+    }
+  } catch (err) {
+    console.error("Error al cargar historial:", err);
+    mostrarMensaje("Error al cargar historial ❌");
+  }
+}
+
+
+
+async function eliminarHistorial(id, cliente) {
+  mostrarConfirmacion(
+    `¿Estás seguro que quieres eliminar los datos guardados de ${cliente}? Esta acción es irreversible.`,
+    async () => {
+      try {
+        await fetch(`http://localhost:3000/api/eliminar/${id}`, { method: 'DELETE' });
+        mostrarHistorial();
+        mostrarMensaje(`Control de ${cliente} eliminado ✅`);
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+      }
+    }
+  );
+}
+
+/* ===========================
+   Extras UI (mensajes y confirmaciones)
+=========================== */
+function mostrarMensaje(texto) {
+  const mensaje = document.getElementById("mensaje-flotante");
+  mensaje.textContent = texto;
+  mensaje.classList.add("show");
+  setTimeout(() => mensaje.classList.remove("show"), 3000);
+}
+
+function mostrarConfirmacion(texto, callbackAceptar) {
+  const confirmBox = document.getElementById("confirmacion-flotante");
+  const mensaje = document.getElementById("mensaje-confirmacion");
+  mensaje.textContent = texto;
+  confirmBox.classList.add("show");
+
+  const btnAceptar = confirmBox.querySelector(".aceptar");
+  const btnCancelar = confirmBox.querySelector(".cancelar");
+
+  btnAceptar.onclick = () => {
+    confirmBox.classList.remove("show");
+    callbackAceptar();
+  };
+  btnCancelar.onclick = () => confirmBox.classList.remove("show");
+}
+
+/* ===========================
+   Recolectar datos del formulario
+=========================== */
+function recolectarDatos() {
+  const serviciosRealizados = [];
+  document.querySelectorAll("#tabla-servicios-realizados tbody tr").forEach(row => {
+    serviciosRealizados.push({
+      servicio: row.querySelector(".servicio-realizado").value.trim(),
+      monto: parseFloat(row.querySelector(".monto-servicio-realizado").value) || 0,
+    });
+  });
+
+  const items = [];
+  document.querySelectorAll("#tabla-servicios tbody tr").forEach(row => {
+    items.push({
+      codigo: row.querySelector(".codigo").value.trim(),
+      cantidad: parseFloat(row.querySelector(".cantidad").value) || 0,
+      descripcion: row.querySelector(".descripcion").value.trim(),
+      precio: parseFloat(row.querySelector(".precio").value) || 0,
+    });
+  });
+
+  return {
+    fecha: document.getElementById("fecha").value,
+    cliente: document.getElementById("cliente").value.trim(),
+    ruc: document.getElementById("ruc").value.trim(),
+    vehiculo: document.getElementById("vehiculo").value.trim(),
+    chapa: document.getElementById("chapa").value.trim(),
+    mecanico: document.getElementById("mecanico").value.trim(),
+    factura: document.getElementById("factura").value.trim(),
+    serviciosRealizados,
+    items,
+    totales: {
+      montoFinal: document.getElementById("monto-total-final").textContent.trim(),
+      montoServicios: document.getElementById("montoServicio").textContent.trim(),
+      montoItems: document.getElementById("total-general").textContent.trim(),
+      diferencia: document.getElementById("diferencia").textContent.trim()
+    }
+  };
+
+
+
+}
+
+
