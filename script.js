@@ -167,6 +167,60 @@ function limpiarFormulario() {
 
 const API_URL = "https://back-tff-production.up.railway.app";
 
+
+function recolectarDatos() {
+  // Datos del formulario
+  const cliente_id = document.getElementById("cliente_id").value; // si tenés un select o input con ID
+  const vehiculo = document.getElementById("vehiculo").value;
+  const chapa = document.getElementById("chapa").value;
+  const mecanico = document.getElementById("mecanico").value;
+  const fecha = document.getElementById("fecha").value;
+  const factura = document.getElementById("factura").value;
+
+  // Items de la tabla
+  const items = [];
+  document.querySelectorAll("#tabla-servicios tbody tr").forEach(r => {
+    items.push({
+      codigo: r.querySelector(".codigo")?.value || "",
+      cantidad: parseFloat(r.querySelector(".cantidad")?.value || 0),
+      descripcion: r.querySelector(".descripcion")?.value || "",
+      precio: parseFloat(r.querySelector(".precio")?.value || 0)
+    });
+  });
+
+  // Servicios realizados
+  const servicios = [];
+  document.querySelectorAll("#tabla-servicios-realizados tbody tr").forEach(r => {
+    servicios.push({
+      servicio: r.querySelector(".servicio-realizado")?.value || "",
+      monto: parseFloat(r.querySelector(".monto-servicio-realizado")?.value || 0)
+    });
+  });
+
+  // Totales
+  const monto_total = parseFloat(document.getElementById("total-general").textContent || 0);
+  const monto_servicios = parseFloat(document.getElementById("montoServicio").textContent || 0);
+  const monto_items = monto_total; // o como calcules
+  const diferencia = parseFloat(document.getElementById("diferencia").textContent || 0);
+
+  return {
+    cliente_id,
+    vehiculo,
+    chapa,
+    mecanico,
+    fecha,
+    factura,
+    monto_total,
+    monto_servicios,
+    monto_items,
+    diferencia,
+    servicios,
+    items
+  };
+}
+
+
+
 async function guardarHistorial() {
   try {
     const nuevoControl = recolectarDatos();
