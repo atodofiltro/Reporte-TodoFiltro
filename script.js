@@ -140,9 +140,7 @@ function generarPDF() {
     });
 }
 
-
 function limpiarFormulario() {
-  // Limpiar campos de texto
   document.getElementById("fecha").value = "";
   document.getElementById("cliente").value = "";
   document.getElementById("ruc").value = "";
@@ -151,37 +149,37 @@ function limpiarFormulario() {
   document.getElementById("mecanico").value = "";
   document.getElementById("factura").value = "";
 
-  // Limpiar tablas
   document.querySelector("#tabla-servicios tbody").innerHTML = "";
   document.querySelector("#tabla-servicios-realizados tbody").innerHTML = "";
 
-  // Limpiar totales
   document.getElementById("total-general").textContent = "0";
   document.getElementById("montoServicio").textContent = "0";
   document.getElementById("diferencia").textContent = "0";
   document.getElementById("monto-total-final").textContent = "0";
 
-  // Opcional: agregar una fila vacía al inicio
   agregarFila();
   agregarServicioRealizado();
 }
+
 /* ===========================
-   Funciones con backend (offline)
+   Backend con Railway
 =========================== */
+
+const API_URL = "https://back-tff-production.up.railway.app";
+
 async function guardarHistorial() {
   try {
-    const nuevoControl = recolectarDatos(); // recolecta TODOS los datos del formulario
+    const nuevoControl = recolectarDatos();
 
-    const res = await fetch("http://localhost:3000/api/guardar", {
+    const res = await fetch(`${API_URL}/api/guardar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(nuevoControl)
     });
 
     const data = await res.json();
-    mostrarMensaje(data.mensaje); // mensaje flotante bonito
+    mostrarMensaje(data.mensaje);
 
-    // actualizar historial en el frontend
     mostrarHistorial();
 
   } catch (err) {
@@ -190,10 +188,9 @@ async function guardarHistorial() {
   }
 }
 
-
 async function mostrarHistorial() {
   try {
-    const res = await fetch("http://localhost:3000/api/historial");
+    const res = await fetch(`${API_URL}/api/historial`);
     const historial = await res.json();
     const historialLista = document.getElementById("historial-lista");
     historialLista.innerHTML = "";
@@ -213,7 +210,7 @@ async function mostrarHistorial() {
         <p><strong>Monto Total Final:</strong> ${control.totales?.montoFinal || "0"}</p>
         <div class="no-print">
           <button onclick="cargarHistorial(${index})">Cargar</button>
-          <button onclick="eliminarHistorial(${index})">Eliminar</button>
+          <button onclick="eliminarHistorial(${index}, '${control.cliente}')">Eliminar</button>
         </div>
       `;
       historialLista.appendChild(itemDiv);
@@ -224,16 +221,14 @@ async function mostrarHistorial() {
   }
 }
 
-
 async function cargarHistorial(index) {
   try {
-    const res = await fetch("http://localhost:3000/api/historial");
+    const res = await fetch(`${API_URL}/api/historial`);
     const historial = await res.json();
 
     if (index >= 0 && index < historial.length) {
       const control = historial[index];
 
-      // === Campos generales ===
       document.getElementById("fecha").value = control.fecha || "";
       document.getElementById("cliente").value = control.cliente || "";
       document.getElementById("ruc").value = control.ruc || "";
@@ -242,16 +237,14 @@ async function cargarHistorial(index) {
       document.getElementById("mecanico").value = control.mecanico || "";
       document.getElementById("factura").value = control.factura || "";
 
-      // === Tabla servicios realizados ===
-      const tbodyServicios = document.querySelector("#tabla-servicios-realizados tbody");
-      tbodyServicios.innerHTML = "";
+      const tbodyServiciosR = document.querySelector("#tabla-servicios-realizados tbody");
+      tbodyServiciosR.innerHTML = "";
       if (control.serviciosRealizados?.length > 0) {
         control.serviciosRealizados.forEach(sr => agregarServicioRealizado(sr.servicio, sr.monto));
       } else {
         agregarServicioRealizado();
       }
 
-      // === Tabla ítems utilizados ===
       const tbodyItems = document.querySelector("#tabla-servicios tbody");
       tbodyItems.innerHTML = "";
       if (control.items?.length > 0) {
@@ -260,39 +253,36 @@ async function cargarHistorial(index) {
         agregarFila();
       }
 
-      // === Totales ===
       calcularTotales();
-
-      // === Mensaje flotante bonito ===
       mostrarMensaje(`Control de ${control.cliente} cargado exitosamente ✅`);
+
     } else {
-      mostrarMensaje("Error: índice de historial no válido ❌");
+      mostrarMensaje("Índice inválido ❌");
     }
+
   } catch (err) {
     console.error("Error al cargar historial:", err);
     mostrarMensaje("Error al cargar historial ❌");
   }
 }
 
-
-
 async function eliminarHistorial(id, cliente) {
   mostrarConfirmacion(
-    `¿Estás seguro que quieres eliminar los datos guardados de ${cliente}? Esta acción es irreversible.`,
+    `¿Estás seguro que quieres eliminar los datos de ${cliente}? Esta acción es irreversible.`,
     async () => {
       try {
-        await fetch(`http://localhost:3000/api/eliminar/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/api/eliminar/${id}`, { method: "DELETE" });
         mostrarHistorial();
         mostrarMensaje(`Control de ${cliente} eliminado ✅`);
-      } catch (error) {
-        console.error("Error al eliminar:", error);
+      } catch (err) {
+        console.error("Error al eliminar:", err);
       }
     }
   );
 }
 
 /* ===========================
-   Extras UI (mensajes y confirmaciones)
+   Extras UI
 =========================== */
 function mostrarMensaje(texto) {
   const mensaje = document.getElementById("mensaje-flotante");
@@ -314,51 +304,8 @@ function mostrarConfirmacion(texto, callbackAceptar) {
     confirmBox.classList.remove("show");
     callbackAceptar();
   };
-  btnCancelar.onclick = () => confirmBox.classList.remove("show");
-}
 
-/* ===========================
-   Recolectar datos del formulario
-=========================== */
-function recolectarDatos() {
-  const serviciosRealizados = [];
-  document.querySelectorAll("#tabla-servicios-realizados tbody tr").forEach(row => {
-    serviciosRealizados.push({
-      servicio: row.querySelector(".servicio-realizado").value.trim(),
-      monto: parseFloat(row.querySelector(".monto-servicio-realizado").value) || 0,
-    });
-  });
-
-  const items = [];
-  document.querySelectorAll("#tabla-servicios tbody tr").forEach(row => {
-    items.push({
-      codigo: row.querySelector(".codigo").value.trim(),
-      cantidad: parseFloat(row.querySelector(".cantidad").value) || 0,
-      descripcion: row.querySelector(".descripcion").value.trim(),
-      precio: parseFloat(row.querySelector(".precio").value) || 0,
-    });
-  });
-
-  return {
-    fecha: document.getElementById("fecha").value,
-    cliente: document.getElementById("cliente").value.trim(),
-    ruc: document.getElementById("ruc").value.trim(),
-    vehiculo: document.getElementById("vehiculo").value.trim(),
-    chapa: document.getElementById("chapa").value.trim(),
-    mecanico: document.getElementById("mecanico").value.trim(),
-    factura: document.getElementById("factura").value.trim(),
-    serviciosRealizados,
-    items,
-    totales: {
-      montoFinal: document.getElementById("monto-total-final").textContent.trim(),
-      montoServicios: document.getElementById("montoServicio").textContent.trim(),
-      montoItems: document.getElementById("total-general").textContent.trim(),
-      diferencia: document.getElementById("diferencia").textContent.trim()
-    }
+  btnCancelar.onclick = () => {
+    confirmBox.classList.remove("show");
   };
-
-
-
 }
-
-
