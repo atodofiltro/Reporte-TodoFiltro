@@ -170,7 +170,7 @@ const API_URL = "https://back-tff-production.up.railway.app";
 
 function recolectarDatos() {
   // Datos del formulario
-  const cliente_id = document.getElementById("cliente_id").value; // si tenés un select o input con ID
+  const cliente_id = document.getElementById("cliente").value; // si tenés un select o input con ID
   const vehiculo = document.getElementById("vehiculo").value;
   const chapa = document.getElementById("chapa").value;
   const mecanico = document.getElementById("mecanico").value;
