@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  cargarClientes(); // cargamos clientes en el select
   actualizarEventos();
   calcularTotales();
   habilitarEnterParaTabular();
@@ -143,6 +144,7 @@ function generarPDF() {
 function limpiarFormulario() {
   document.getElementById("fecha").value = "";
   document.getElementById("cliente").value = "";
+  document.getElementById("cliente_id")?.remove(); // quitar si existía
   document.getElementById("ruc").value = "";
   document.getElementById("vehiculo").value = "";
   document.getElementById("chapa").value = "";
@@ -167,10 +169,34 @@ function limpiarFormulario() {
 
 const API_URL = "https://back-tff-production.up.railway.app";
 
+// Cargar clientes y asignar cliente_id
+async function cargarClientes() {
+  try {
+    const res = await fetch(`${API_URL}/api/clientes`);
+    const data = await res.json();
+    const inputCliente = document.getElementById("cliente");
+
+    if (data.ok && data.datos.length > 0) {
+      // Si solo querés mostrar el primer cliente automáticamente
+      inputCliente.value = data.datos[0].nombre;
+      // Guardar cliente_id en input oculto
+      let hiddenId = document.getElementById("cliente_id");
+      if (!hiddenId) {
+        hiddenId = document.createElement("input");
+        hiddenId.type = "hidden";
+        hiddenId.id = "cliente_id";
+        inputCliente.parentNode.appendChild(hiddenId);
+      }
+      hiddenId.value = data.datos[0].id;
+    }
+  } catch (err) {
+    console.error("Error cargando clientes:", err);
+  }
+}
 
 function recolectarDatos() {
   // Datos del formulario
-  const cliente_id = document.getElementById("cliente").value; // si tenés un select o input con ID
+  const cliente_id = parseInt(document.getElementById("cliente_id").value || 0); // ✅ número
   const vehiculo = document.getElementById("vehiculo").value;
   const chapa = document.getElementById("chapa").value;
   const mecanico = document.getElementById("mecanico").value;
@@ -219,8 +245,6 @@ function recolectarDatos() {
   };
 }
 
-
-
 async function guardarHistorial() {
   try {
     const nuevoControl = recolectarDatos();
@@ -242,6 +266,9 @@ async function guardarHistorial() {
   }
 }
 
+/* ===========================
+   Historial
+=========================== */
 
 async function mostrarHistorial() {
   try {
@@ -286,6 +313,13 @@ async function cargarHistorial(index) {
 
       document.getElementById("fecha").value = control.fecha || "";
       document.getElementById("cliente").value = control.cliente || "";
+      if (!document.getElementById("cliente_id")) {
+        const hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.id = "cliente_id";
+        document.getElementById("cliente").parentNode.appendChild(hidden);
+      }
+      document.getElementById("cliente_id").value = control.cliente_id || 0;
       document.getElementById("ruc").value = control.ruc || "";
       document.getElementById("vehiculo").value = control.vehiculo || "";
       document.getElementById("chapa").value = control.chapa || "";
@@ -364,7 +398,6 @@ function mostrarConfirmacion(texto, callbackAceptar) {
     confirmBox.classList.remove("show");
   };
 }
-
 
 /* ===========================
    Botón para ir a BDD
