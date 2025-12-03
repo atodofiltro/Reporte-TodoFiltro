@@ -363,3 +363,11 @@ function mostrarConfirmacion(texto, callbackAceptar) {
     confirmBox.classList.remove("show");
   };
 }
+
+
+/* ===========================
+   Botón para ir a BDD
+=========================== */
+function irABDD() {
+  window.location.href = "bdd.html";
+}

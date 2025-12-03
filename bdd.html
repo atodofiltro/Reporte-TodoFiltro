@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📊 Base de Datos - Todo Filtro</title>
+  <link rel="stylesheet" href="bdd.css" />
+</head>
+<body>
+  <header class="header-empresa">
+    <img src="todofiltro.webp" alt="Logo Todo Filtro" class="logo-empresa">
+    <h1 class="nombre-empresa">Todo Filtro - BDD</h1>
+  </header>
+
+  <main>
+    <h2>📋 Controles Registrados</h2>
+    <table id="tabla-controles">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>RUC</th>
+          <th>Vehículo</th>
+          <th>Chapa</th>
+          <th>Mecánico</th>
+          <th>Factura</th>
+          <th>Total Ítems</th>
+          <th>Total Servicios</th>
+          <th>Diferencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Datos se llenan desde bdd.js -->
+      </tbody>
+    </table>
+
+    <h2>🛠 Servicios Detallados</h2>
+    <table id="tabla-servicios-detalle">
+      <thead>
+        <tr>
+          <th># Control</th>
+          <th>Servicio</th>
+          <th>Monto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Datos se llenan desde bdd.js -->
+      </tbody>
+    </table>
+
+    <h2>📦 Ítems Detallados</h2>
+    <table id="tabla-items-detalle">
+      <thead>
+        <tr>
+          <th># Control</th>
+          <th>Código</th>
+          <th>Cantidad</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Datos se llenan desde bdd.js -->
+      </tbody>
+    </table>
+  </main>
+
+  <script src="bdd.js" defer></script>
+</body>
+</html>
