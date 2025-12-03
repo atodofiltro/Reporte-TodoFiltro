@@ -243,8 +243,6 @@ async function guardarHistorial() {
 }
 
 
-
-
 async function mostrarHistorial() {
   try {
     const res = await fetch(`${API_URL}/api/historial`);
