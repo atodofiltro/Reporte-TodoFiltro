@@ -225,7 +225,7 @@ async function guardarHistorial() {
   try {
     const nuevoControl = recolectarDatos();
 
-    const res = await fetch(`${API_URL}/api/guardar`, {
+    const res = await fetch(`${API_URL}/api/insertControl`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(nuevoControl)
@@ -241,6 +241,7 @@ async function guardarHistorial() {
     mostrarMensaje("Error al guardar control ❌");
   }
 }
+
 
 async function mostrarHistorial() {
   try {
