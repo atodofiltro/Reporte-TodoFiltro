@@ -1,3 +1,8 @@
+document.addEventListener("DOMContentLoaded", () => {
+  mostrarHistorial(); // carga los controles desde backend
+});
+
+
 /*
 document.addEventListener("DOMContentLoaded", () => {
   cargarClientes(); // cargamos clientes en el select
@@ -297,16 +302,18 @@ async function mostrarHistorial() {
         <p><strong>Monto Total Final:</strong> ${control.totales?.montoFinal || "0"}</p>
         <div class="no-print">
           <button onclick="cargarHistorial(${index})">Cargar</button>
-          <button onclick="eliminarHistorial(${index}, '${control.cliente}')">Eliminar</button>
+          <button onclick="eliminarHistorial(${control.id}, '${control.cliente}')">Eliminar</button>
         </div>
       `;
       historialLista.appendChild(itemDiv);
     });
+
   } catch (err) {
     console.error("Error al cargar historial:", err);
     mostrarMensaje("Error al cargar historial ❌");
   }
 }
+
 
 async function cargarHistorial(index) {
   try {
