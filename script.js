@@ -417,3 +417,64 @@ function mostrarConfirmacion(texto, callbackAceptar) {
 function irABDD() {
   window.location.href = "bdd.html";
 }
+
+
+let controlesMemoria = []; // Aquí guardamos los controles cargados desde el backend
+
+async function mostrarHistorial() {
+  try {
+    const res = await fetch(`${API_URL}/api/historial`);
+    const historial = await res.json();
+    controlesMemoria = historial; // guardamos en memoria
+    renderizarHistorial(historial);
+  } catch (err) {
+    console.error("Error al cargar historial:", err);
+    mostrarMensaje("Error al cargar historial ❌");
+  }
+}
+
+function renderizarHistorial(lista) {
+  const historialLista = document.getElementById("historial-lista");
+  historialLista.innerHTML = "";
+
+  if (lista.length === 0) {
+    historialLista.innerHTML = "<p>No hay controles guardados en el historial</p>";
+    return;
+  }
+
+  lista.forEach((control, index) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.classList.add("historial-item");
+    itemDiv.innerHTML = `
+      <p><strong>Fecha:</strong> ${control.fecha || "N/A"}</p>
+      <p><strong>Cliente:</strong> ${control.cliente || "N/A"}</p>
+      <p><strong>Vehículo:</strong> ${control.vehiculo || "N/A"} - ${control.chapa || "N/A"}</p>
+      <div class="no-print">
+        <button onclick="cargarHistorial(${index})">Cargar</button>
+        <button onclick="eliminarHistorial(${index}, '${control.cliente}')">Eliminar</button>
+      </div>
+    `;
+    historialLista.appendChild(itemDiv);
+  });
+}
+
+// Función de filtrado
+function filtrarHistorial() {
+  const clienteBuscado = document.getElementById("buscar-cliente").value.toLowerCase();
+  const vehiculoBuscado = document.getElementById("buscar-vehiculo").value.toLowerCase();
+  const fechaBuscada = document.getElementById("buscar-fecha").value;
+
+  const filtrado = controlesMemoria.filter(c => {
+    const coincideCliente = c.cliente?.toLowerCase().includes(clienteBuscado) || false;
+    const coincideVehiculo = c.vehiculo?.toLowerCase().includes(vehiculoBuscado) || false;
+    const coincideFecha = fechaBuscada ? c.fecha?.startsWith(fechaBuscada) : true;
+    return coincideCliente && coincideVehiculo && coincideFecha;
+  });
+
+  renderizarHistorial(filtrado);
+}
+
+// Eventos de los filtros
+document.getElementById("buscar-cliente").addEventListener("input", filtrarHistorial);
+document.getElementById("buscar-vehiculo").addEventListener("input", filtrarHistorial);
+document.getElementById("buscar-fecha").addEventListener("change", filtrarHistorial);

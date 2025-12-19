@@ -106,9 +106,19 @@
     <p><strong>Monto total final:</strong> <span id="monto-total-final">0</span></p>
   </div>
 
-  <div class="form-section">
-    <h3 style="color: #007bff">📁 Historial de Controles Guardados</h3>
-    <div id="historial-lista">
+ <div class="form-section">
+  <h3 style="color: #007bff">📁 Historial de Controles Guardados</h3>
+
+  <div id="filtros-historial">
+    <input type="text" id="buscar-cliente" placeholder="Buscar por cliente">
+    <input type="text" id="buscar-vehiculo" placeholder="Buscar por vehículo">
+    <input type="date" id="buscar-fecha">
+  </div>
+
+  <div id="historial-lista"></div> <!-- Solo un div para la lista -->
+</div>
+
+
       <!-- Aquí se cargará el historial -->
     </div>
   </div>
