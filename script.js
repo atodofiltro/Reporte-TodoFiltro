@@ -200,6 +200,7 @@ async function cargarClientes() {
 function recolectarDatos() {
   // Datos del formulario
   const cliente = document.getElementById("cliente").value.trim();
+  const ruc = document.getElementById("ruc").value.trim();
   const vehiculo = document.getElementById("vehiculo").value;
   const chapa = document.getElementById("chapa").value;
   const mecanico = document.getElementById("mecanico").value;
@@ -234,6 +235,7 @@ function recolectarDatos() {
 
   return {
     cliente,          // 👈 IMPORTANTE
+    ruc,
     vehiculo,
     chapa,
     mecanico,
