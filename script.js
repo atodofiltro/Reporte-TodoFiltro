@@ -1,3 +1,4 @@
+/*
 document.addEventListener("DOMContentLoaded", () => {
   cargarClientes(); // cargamos clientes en el select
   actualizarEventos();
@@ -169,6 +170,7 @@ function limpiarFormulario() {
 
 const API_URL = "https://back-tff-production.up.railway.app";
 
+/*
 // Cargar clientes y asignar cliente_id
 async function cargarClientes() {
   try {
@@ -193,10 +195,11 @@ async function cargarClientes() {
     console.error("Error cargando clientes:", err);
   }
 }
+   */
 
 function recolectarDatos() {
   // Datos del formulario
-  const cliente_id = parseInt(document.getElementById("cliente_id").value || 0); // ✅ número
+  const cliente = document.getElementById("cliente").value.trim();
   const vehiculo = document.getElementById("vehiculo").value;
   const chapa = document.getElementById("chapa").value;
   const mecanico = document.getElementById("mecanico").value;
