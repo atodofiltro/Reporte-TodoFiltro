@@ -206,14 +206,14 @@ function recolectarDatos() {
   const fecha = document.getElementById("fecha").value;
   const factura = document.getElementById("factura").value;
 
-  // Items de la tabla
+  // Items
   const items = [];
   document.querySelectorAll("#tabla-servicios tbody tr").forEach(r => {
     items.push({
       codigo: r.querySelector(".codigo")?.value || "",
-      cantidad: parseFloat(r.querySelector(".cantidad")?.value || 0),
+      cantidad: Number(r.querySelector(".cantidad")?.value || 0),
       descripcion: r.querySelector(".descripcion")?.value || "",
-      precio: parseFloat(r.querySelector(".precio")?.value || 0)
+      precio: Number(r.querySelector(".precio")?.value || 0)
     });
   });
 
@@ -222,18 +222,18 @@ function recolectarDatos() {
   document.querySelectorAll("#tabla-servicios-realizados tbody tr").forEach(r => {
     servicios.push({
       servicio: r.querySelector(".servicio-realizado")?.value || "",
-      monto: parseFloat(r.querySelector(".monto-servicio-realizado")?.value || 0)
+      monto: Number(r.querySelector(".monto-servicio-realizado")?.value || 0)
     });
   });
 
   // Totales
-  const monto_total = parseFloat(document.getElementById("total-general").textContent || 0);
-  const monto_servicios = parseFloat(document.getElementById("montoServicio").textContent || 0);
-  const monto_items = monto_total; // o como calcules
-  const diferencia = parseFloat(document.getElementById("diferencia").textContent || 0);
+  const monto_total = Number(document.getElementById("total-general").textContent || 0);
+  const monto_servicios = Number(document.getElementById("montoServicio").textContent || 0);
+  const monto_items = monto_total;
+  const diferencia = Number(document.getElementById("diferencia").textContent || 0);
 
   return {
-    cliente_id,
+    cliente,          // 👈 IMPORTANTE
     vehiculo,
     chapa,
     mecanico,
