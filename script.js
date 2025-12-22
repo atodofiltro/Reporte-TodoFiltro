@@ -301,7 +301,7 @@ async function mostrarHistorial() {
         <p><strong>Vehículo:</strong> ${control.vehiculo || "N/A"} - ${control.chapa || "N/A"}</p>
         <p><strong>Monto Total Final:</strong> ${control.totales?.montoFinal || "0"}</p>
         <div class="no-print">
-          <button onclick="cargarHistorial(${index})">Cargar</button>
+          <button onclick="cargarHistorial(${control.id})">Cargar</button>
           <button onclick="eliminarHistorial(${control.id}, '${control.cliente}')">Eliminar</button>
         </div>
       `;
@@ -315,59 +315,57 @@ async function mostrarHistorial() {
 }
 
 
-async function cargarHistorial(index) {
+async function cargarHistorial(id) {
   try {
     const res = await fetch(`${API_URL}/api/historial`);
     const historial = await res.json();
 
-    if (index >= 0 && index < historial.length) {
-      const control = historial[index];
+    const control = historial.find(c => c.id === id);
 
-      document.getElementById("fecha").value = control.fecha || "";
-      document.getElementById("cliente").value = control.cliente || "";
-      if (!document.getElementById("cliente_id")) {
-        const hidden = document.createElement("input");
-        hidden.type = "hidden";
-        hidden.id = "cliente_id";
-        document.getElementById("cliente").parentNode.appendChild(hidden);
-      }
-      document.getElementById("cliente_id").value = control.cliente_id || 0;
-      document.getElementById("ruc").value = control.ruc || "";
-      document.getElementById("vehiculo").value = control.vehiculo || "";
-      document.getElementById("chapa").value = control.chapa || "";
-      document.getElementById("mecanico").value = control.mecanico || "";
-      document.getElementById("factura").value = control.factura || "";
-
-      const tbodyServiciosR = document.querySelector("#tabla-servicios-realizados tbody");
-      tbodyServiciosR.innerHTML = "";
-    if (control.servicios?.length > 0) {
-      control.servicios.forEach(sr =>
-      agregarServicioRealizado(sr.servicio, sr.monto)
-     );
-    } else {
-    agregarServicioRealizado();
+    if (!control) {
+      mostrarMensaje("Control no encontrado ❌");
+      return;
     }
 
-      const tbodyItems = document.querySelector("#tabla-servicios tbody");
-      tbodyItems.innerHTML = "";
-      if (control.items?.length > 0) {
-        control.items.forEach(item => agregarFila(item.codigo, item.cantidad, item.descripcion, item.precio));
-      } else {
-        agregarFila();
-      }
+    // CARGA DE DATOS
+    document.getElementById("fecha").value = control.fecha || "";
+    document.getElementById("cliente").value = control.cliente || "";
+    document.getElementById("vehiculo").value = control.vehiculo || "";
+    document.getElementById("chapa").value = control.chapa || "";
+    document.getElementById("mecanico").value = control.mecanico || "";
+    document.getElementById("factura").value = control.factura || "";
 
-      calcularTotales();
-      mostrarMensaje(`Control de ${control.cliente} cargado exitosamente ✅`);
-
+    // Servicios realizados
+    const tbodyServ = document.querySelector("#tabla-servicios-realizados tbody");
+    tbodyServ.innerHTML = "";
+    if (control.serviciosRealizados?.length) {
+      control.serviciosRealizados.forEach(s =>
+        agregarServicioRealizado(s.servicio, s.monto)
+      );
     } else {
-      mostrarMensaje("Índice inválido ❌");
+      agregarServicioRealizado();
     }
+
+    // Items
+    const tbodyItems = document.querySelector("#tabla-servicios tbody");
+    tbodyItems.innerHTML = "";
+    if (control.items?.length) {
+      control.items.forEach(i =>
+        agregarFila(i.codigo, i.cantidad, i.descripcion, i.precio)
+      );
+    } else {
+      agregarFila();
+    }
+
+    calcularTotales();
+    mostrarMensaje(`Control de ${control.cliente} cargado ✅`);
 
   } catch (err) {
-    console.error("Error al cargar historial:", err);
-    mostrarMensaje("Error al cargar historial ❌");
+    console.error(err);
+    mostrarMensaje("Error al cargar control ❌");
   }
 }
+
 
 async function eliminarHistorial(id, cliente) {
   mostrarConfirmacion(
