@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarHistorial(); // carga los controles desde backend
 });
 
+let HISTORIAL_GLOBAL = [];
+
 
 /*
 document.addEventListener("DOMContentLoaded", () => {
@@ -283,36 +285,15 @@ async function guardarHistorial() {
 async function mostrarHistorial() {
   try {
     const res = await fetch(`${API_URL}/api/historial`);
-    const historial = await res.json();
-    const historialLista = document.getElementById("historial-lista");
-    historialLista.innerHTML = "";
+    HISTORIAL_GLOBAL = await res.json(); // guardamos todo en memoria
 
-    if (historial.length === 0) {
-      historialLista.innerHTML = "<p>No hay controles guardados en el historial</p>";
-      return;
-    }
-
-    historial.forEach((control, index) => {
-      const itemDiv = document.createElement("div");
-      itemDiv.classList.add("historial-item");
-      itemDiv.innerHTML = `
-        <p><strong>Fecha:</strong> ${control.fecha || "N/A"}</p>
-        <p><strong>Cliente:</strong> ${control.cliente || "N/A"}</p>
-        <p><strong>Vehículo:</strong> ${control.vehiculo || "N/A"} - ${control.chapa || "N/A"}</p>
-        <p><strong>Monto Total Final:</strong> ${control.totales?.montoFinal || "0"}</p>
-        <div class="no-print">
-          <button onclick="cargarHistorial(${control.id})">Cargar</button>
-          <button onclick="eliminarHistorial(${control.id}, '${control.cliente}')">Eliminar</button>
-        </div>
-      `;
-      historialLista.appendChild(itemDiv);
-    });
-
+    renderHistorial(HISTORIAL_GLOBAL); // mostramos todo
   } catch (err) {
     console.error("Error al cargar historial:", err);
     mostrarMensaje("Error al cargar historial ❌");
   }
 }
+
 
 
 async function cargarHistorial(id) {
@@ -421,42 +402,33 @@ function irABDD() {
 
 let controlesMemoria = []; // Aquí guardamos los controles cargados desde el backend
 
-async function mostrarHistorial() {
-  try {
-    const res = await fetch(`${API_URL}/api/historial`);
-    const historial = await res.json();
-    controlesMemoria = historial; // guardamos en memoria
-    renderizarHistorial(historial);
-  } catch (err) {
-    console.error("Error al cargar historial:", err);
-    mostrarMensaje("Error al cargar historial ❌");
-  }
-}
-
-function renderizarHistorial(lista) {
+function renderHistorial(lista) {
   const historialLista = document.getElementById("historial-lista");
   historialLista.innerHTML = "";
 
-  if (lista.length === 0) {
-    historialLista.innerHTML = "<p>No hay controles guardados en el historial</p>";
+  if (!lista || lista.length === 0) {
+    historialLista.innerHTML = "<p>No hay controles guardados</p>";
     return;
   }
 
-  lista.forEach((control, index) => {
+  lista.forEach(control => {
     const itemDiv = document.createElement("div");
     itemDiv.classList.add("historial-item");
+
     itemDiv.innerHTML = `
       <p><strong>Fecha:</strong> ${control.fecha || "N/A"}</p>
       <p><strong>Cliente:</strong> ${control.cliente || "N/A"}</p>
-      <p><strong>Vehículo:</strong> ${control.vehiculo || "N/A"} - ${control.chapa || "N/A"}</p>
+      <p><strong>Vehículo:</strong> ${control.vehiculo || "N/A"} - ${control.chapa || ""}</p>
+
       <div class="no-print">
-        <button onclick="cargarHistorial(${index})">Cargar</button>
-        <button onclick="eliminarHistorial(${index}, '${control.cliente}')">Eliminar</button>
+        <button onclick="cargarHistorial(${control.id})">Cargar</button>
       </div>
     `;
+
     historialLista.appendChild(itemDiv);
   });
 }
+
 
 // Función de filtrado
 function filtrarHistorial() {
