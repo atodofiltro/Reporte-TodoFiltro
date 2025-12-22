@@ -340,11 +340,13 @@ async function cargarHistorial(index) {
 
       const tbodyServiciosR = document.querySelector("#tabla-servicios-realizados tbody");
       tbodyServiciosR.innerHTML = "";
-      if (control.serviciosRealizados?.length > 0) {
-        control.serviciosRealizados.forEach(sr => agregarServicioRealizado(sr.servicio, sr.monto));
-      } else {
-        agregarServicioRealizado();
-      }
+    if (control.servicios?.length > 0) {
+      control.servicios.forEach(sr =>
+      agregarServicioRealizado(sr.servicio, sr.monto)
+     );
+    } else {
+    agregarServicioRealizado();
+    }
 
       const tbodyItems = document.querySelector("#tabla-servicios tbody");
       tbodyItems.innerHTML = "";
