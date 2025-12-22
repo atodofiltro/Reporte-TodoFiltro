@@ -4,16 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let HISTORIAL_GLOBAL = [];
 
-
-/*
-document.addEventListener("DOMContentLoaded", () => {
-  cargarClientes(); // cargamos clientes en el select
-  actualizarEventos();
-  calcularTotales();
-  habilitarEnterParaTabular();
-  mostrarHistorial(); // obtiene los datos desde el backend
-});
-
 /* ===========================
    Funciones para tablas
 =========================== */
@@ -152,7 +142,7 @@ function generarPDF() {
 function limpiarFormulario() {
   document.getElementById("fecha").value = "";
   document.getElementById("cliente").value = "";
-  document.getElementById("cliente_id")?.remove(); // quitar si existía
+  document.getElementById("cliente_id")?.remove();
   document.getElementById("ruc").value = "";
   document.getElementById("vehiculo").value = "";
   document.getElementById("chapa").value = "";
@@ -174,38 +164,9 @@ function limpiarFormulario() {
 /* ===========================
    Backend con Railway
 =========================== */
-
 const API_URL = "https://back-tff-production.up.railway.app";
 
-/*
-// Cargar clientes y asignar cliente_id
-async function cargarClientes() {
-  try {
-    const res = await fetch(`${API_URL}/api/clientes`);
-    const data = await res.json();
-    const inputCliente = document.getElementById("cliente");
-
-    if (data.ok && data.datos.length > 0) {
-      // Si solo querés mostrar el primer cliente automáticamente
-      inputCliente.value = data.datos[0].nombre;
-      // Guardar cliente_id en input oculto
-      let hiddenId = document.getElementById("cliente_id");
-      if (!hiddenId) {
-        hiddenId = document.createElement("input");
-        hiddenId.type = "hidden";
-        hiddenId.id = "cliente_id";
-        inputCliente.parentNode.appendChild(hiddenId);
-      }
-      hiddenId.value = data.datos[0].id;
-    }
-  } catch (err) {
-    console.error("Error cargando clientes:", err);
-  }
-}
-   */
-
 function recolectarDatos() {
-  // Datos del formulario
   const cliente = document.getElementById("cliente").value.trim();
   const ruc = document.getElementById("ruc").value.trim();
   const vehiculo = document.getElementById("vehiculo").value;
@@ -214,7 +175,6 @@ function recolectarDatos() {
   const fecha = document.getElementById("fecha").value;
   const factura = document.getElementById("factura").value;
 
-  // Items
   const items = [];
   document.querySelectorAll("#tabla-servicios tbody tr").forEach(r => {
     items.push({
@@ -225,7 +185,6 @@ function recolectarDatos() {
     });
   });
 
-  // Servicios realizados
   const servicios = [];
   document.querySelectorAll("#tabla-servicios-realizados tbody tr").forEach(r => {
     servicios.push({
@@ -234,14 +193,13 @@ function recolectarDatos() {
     });
   });
 
-  // Totales
   const monto_total = Number(document.getElementById("total-general").textContent || 0);
   const monto_servicios = Number(document.getElementById("montoServicio").textContent || 0);
   const monto_items = monto_total;
   const diferencia = Number(document.getElementById("diferencia").textContent || 0);
 
   return {
-    cliente,          // 👈 IMPORTANTE
+    cliente,
     ruc,
     vehiculo,
     chapa,
@@ -271,7 +229,6 @@ async function guardarHistorial() {
     mostrarMensaje(data.mensaje);
 
     mostrarHistorial();
-
   } catch (err) {
     console.error("Error al guardar:", err);
     mostrarMensaje("Error al guardar control ❌");
@@ -281,20 +238,17 @@ async function guardarHistorial() {
 /* ===========================
    Historial
 =========================== */
-
 async function mostrarHistorial() {
   try {
     const res = await fetch(`${API_URL}/api/historial`);
     HISTORIAL_GLOBAL = await res.json(); // guardamos todo en memoria
 
-    renderHistorial(HISTORIAL_GLOBAL); // mostramos todo
+    renderHistorial(HISTORIAL_GLOBAL);
   } catch (err) {
     console.error("Error al cargar historial:", err);
     mostrarMensaje("Error al cargar historial ❌");
   }
 }
-
-
 
 function cargarHistorial(control) {
   try {
@@ -316,8 +270,8 @@ function cargarHistorial(control) {
     // Limpiar tablas
     const tbodyServiciosR = document.querySelector("#tabla-servicios-realizados tbody");
     tbodyServiciosR.innerHTML = "";
-    if (control.serviciosRealizados?.length > 0) {
-      control.serviciosRealizados.forEach(sr => agregarServicioRealizado(sr.servicio, sr.monto));
+    if (control.servicios?.length > 0) {
+      control.servicios.forEach(sr => agregarServicioRealizado(sr.servicio, sr.monto));
     } else {
       agregarServicioRealizado();
     }
@@ -332,14 +286,11 @@ function cargarHistorial(control) {
 
     calcularTotales();
     mostrarMensaje(`Control de ${control.cliente} cargado exitosamente ✅`);
-
   } catch (err) {
     console.error("Error al cargar historial:", err);
     mostrarMensaje("Error al cargar historial ❌");
   }
 }
-
-
 
 async function eliminarHistorial(id, cliente) {
   mostrarConfirmacion(
@@ -392,9 +343,9 @@ function irABDD() {
   window.location.href = "bdd.html";
 }
 
-
-let controlesMemoria = []; // Aquí guardamos los controles cargados desde el backend
-
+/* ===========================
+   Render Historial + Filtros
+=========================== */
 function renderHistorial(lista) {
   const historialLista = document.getElementById("historial-lista");
   historialLista.innerHTML = "";
@@ -415,10 +366,10 @@ function renderHistorial(lista) {
 
       <div class="no-print">
         <button class="btn-cargar">Cargar</button>
+        <button onclick="eliminarHistorial(${control.id}, '${control.cliente}')">Eliminar</button>
       </div>
     `;
 
-    // Agregamos el control como dataset en el botón
     itemDiv.querySelector(".btn-cargar").addEventListener("click", () => {
       cargarHistorial(control);
     });
@@ -427,22 +378,20 @@ function renderHistorial(lista) {
   });
 }
 
-
-
 // Función de filtrado
 function filtrarHistorial() {
   const clienteBuscado = document.getElementById("buscar-cliente").value.toLowerCase();
   const vehiculoBuscado = document.getElementById("buscar-vehiculo").value.toLowerCase();
   const fechaBuscada = document.getElementById("buscar-fecha").value;
 
-  const filtrado = controlesMemoria.filter(c => {
+  const filtrado = HISTORIAL_GLOBAL.filter(c => {
     const coincideCliente = c.cliente?.toLowerCase().includes(clienteBuscado) || false;
     const coincideVehiculo = c.vehiculo?.toLowerCase().includes(vehiculoBuscado) || false;
     const coincideFecha = fechaBuscada ? c.fecha?.startsWith(fechaBuscada) : true;
     return coincideCliente && coincideVehiculo && coincideFecha;
   });
 
-  renderizarHistorial(filtrado);
+  renderHistorial(filtrado);
 }
 
 // Eventos de los filtros
