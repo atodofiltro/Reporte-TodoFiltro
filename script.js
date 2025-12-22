@@ -296,56 +296,49 @@ async function mostrarHistorial() {
 
 
 
-async function cargarHistorial(id) {
+function cargarHistorial(control) {
   try {
-    const res = await fetch(`${API_URL}/api/historial`);
-    const historial = await res.json();
-
-    const control = historial.find(c => c.id === id);
-
-    if (!control) {
-      mostrarMensaje("Control no encontrado ❌");
-      return;
-    }
-
-    // CARGA DE DATOS
     document.getElementById("fecha").value = control.fecha || "";
     document.getElementById("cliente").value = control.cliente || "";
+    if (!document.getElementById("cliente_id")) {
+      const hidden = document.createElement("input");
+      hidden.type = "hidden";
+      hidden.id = "cliente_id";
+      document.getElementById("cliente").parentNode.appendChild(hidden);
+    }
+    document.getElementById("cliente_id").value = control.cliente_id || 0;
+    document.getElementById("ruc").value = control.ruc || "";
     document.getElementById("vehiculo").value = control.vehiculo || "";
     document.getElementById("chapa").value = control.chapa || "";
     document.getElementById("mecanico").value = control.mecanico || "";
     document.getElementById("factura").value = control.factura || "";
 
-    // Servicios realizados
-    const tbodyServ = document.querySelector("#tabla-servicios-realizados tbody");
-    tbodyServ.innerHTML = "";
-    if (control.serviciosRealizados?.length) {
-      control.serviciosRealizados.forEach(s =>
-        agregarServicioRealizado(s.servicio, s.monto)
-      );
+    // Limpiar tablas
+    const tbodyServiciosR = document.querySelector("#tabla-servicios-realizados tbody");
+    tbodyServiciosR.innerHTML = "";
+    if (control.serviciosRealizados?.length > 0) {
+      control.serviciosRealizados.forEach(sr => agregarServicioRealizado(sr.servicio, sr.monto));
     } else {
       agregarServicioRealizado();
     }
 
-    // Items
     const tbodyItems = document.querySelector("#tabla-servicios tbody");
     tbodyItems.innerHTML = "";
-    if (control.items?.length) {
-      control.items.forEach(i =>
-        agregarFila(i.codigo, i.cantidad, i.descripcion, i.precio)
-      );
+    if (control.items?.length > 0) {
+      control.items.forEach(item => agregarFila(item.codigo, item.cantidad, item.descripcion, item.precio));
     } else {
       agregarFila();
     }
 
     calcularTotales();
-    mostrarMensaje(`Control de ${control.cliente} cargado ✅`);
+    mostrarMensaje(`Control de ${control.cliente} cargado exitosamente ✅`);
 
   } catch (err) {
-    console.error(err);
-    mostrarMensaje("Error al cargar control ❌");
+    console.error("Error al cargar historial:", err);
+    mostrarMensaje("Error al cargar historial ❌");
   }
 }
+
 
 
 async function eliminarHistorial(id, cliente) {
@@ -421,13 +414,19 @@ function renderHistorial(lista) {
       <p><strong>Vehículo:</strong> ${control.vehiculo || "N/A"} - ${control.chapa || ""}</p>
 
       <div class="no-print">
-        <button onclick="cargarHistorial(${control.id})">Cargar</button>
+        <button class="btn-cargar">Cargar</button>
       </div>
     `;
+
+    // Agregamos el control como dataset en el botón
+    itemDiv.querySelector(".btn-cargar").addEventListener("click", () => {
+      cargarHistorial(control);
+    });
 
     historialLista.appendChild(itemDiv);
   });
 }
+
 
 
 // Función de filtrado
